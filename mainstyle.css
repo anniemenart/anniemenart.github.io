@@ -32,6 +32,11 @@ p {
 	color: #253241;
 }
 
+li {
+	font-family: 'Montserrat', sans-serif;
+	color: #253241;
+}
+
 .main {
          width: 90%;
          margin-left: 5%;
