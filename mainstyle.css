@@ -3,6 +3,7 @@
 h1 {	
 	color: #6D93BF;
 	font-family: 'Manrope', sans-serif;
+	padding-top: 30px;
 }
 
 
@@ -44,4 +45,8 @@ li {
 
 footer {
 	 background: #6D93BF;
+}
+
+.row {
+	margin-top: 40px;
 }
