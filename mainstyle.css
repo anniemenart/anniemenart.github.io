@@ -51,3 +51,9 @@ footer {
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
+
+.left-line {
+	margin-left: 5px;
+	padding-left: 17px;
+	border-left: 9px solid #496280;
+}
