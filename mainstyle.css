@@ -28,16 +28,11 @@ h6 {
 	font-family: 'Manrope', sans-serif;
 }
 
-p {
+p, li {
 	font-family: 'Montserrat', sans-serif;
 	color: #253241;
 	font-size: 1.2rem;
 	text-align: justify;
-}
-
-li {
-	font-family: 'Montserrat', sans-serif;
-	color: #253241;
 }
 
 .main {
@@ -46,7 +41,7 @@ li {
 }
 
 footer {
-	 background: #6D93BF;
+	 background: #97ADCC;
 }
 
 .row {
