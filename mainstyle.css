@@ -24,6 +24,10 @@ p, li {
 	text-align: justify;
 }
 
+a {
+	font-weight: 800;
+}
+
 .main {
          width: 85%;
          margin-left: 7.5%;
