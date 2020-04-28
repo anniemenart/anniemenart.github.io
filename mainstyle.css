@@ -24,7 +24,10 @@ p, li {
 	text-align: justify;
 }
 
-a {
+p a, p li {
+	font-family: 'Montserrat', sans-serif;
+	color: #3C4A60;
+	font-size: 1.2rem;
 	font-weight: 800;
 }
 
