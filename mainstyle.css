@@ -176,9 +176,9 @@ footer {
    width: 100%;
    top: 50%;
    left: 50%;
-   transform: translate(-50%, -95%);
+   transform: translate(-50%, -50%);
    position: absolute;
-   -ms-transform: translate(-50%, -95%);
+   -ms-transform: translate(-50%, -50%);
 }
 
 .textSmall {
