@@ -171,6 +171,33 @@ footer {
    margin-top: -60px;
 }
 
+.centerSmall {
+   margin: 0px;
+   width: 100%;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -95%);
+   position: absolute;
+   -ms-transform: translate(-50%, -95%);
+}
+
+.textSmall {
+   position: relative;
+   height: 25vh;
+}
+
+.jumbotronSmall {
+   width: 100%;
+   background: url("anniebete.github.io/img/Background.jpg");
+   height: 25vh !important;
+   margin-bottom: 0px !important;
+   border-radius: 0px !important;
+   background-position: center;
+   background-repeat: no-repeat;
+   background-size: cover;
+   position: relative;
+   margin-top: -60px;
+}
 
 .line {
    border-top: 5px solid #FFF;
