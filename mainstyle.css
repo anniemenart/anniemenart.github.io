@@ -207,3 +207,15 @@ footer {
   background-color: #6393BF !important;
 }
 }
+
+li.nav-item {
+	color: #FFF;
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 400;
+}
+
+a.navbar-brand {
+	color: #FFF;
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 800;
+}
