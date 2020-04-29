@@ -1,23 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
-.main h1 {	
+h1 {	
 	color: #6D93BF;
 	font-family: 'Manrope', sans-serif;
 	padding-top: 30px;
 	text-transform: uppercase;
 }
 
-.main h2 {
+h2 {
 	color: #496280;
 	font-family: 'Manrope', sans-serif;
 }
 
-.main h3, .main h4, .main h5, .main h6 {
+h3, h4, h5, h6 {
 	font-family: 'Manrope', sans-serif;
 	color: #273240;
 }
 
-.main p, .main li {
+p, li {
 	font-family: 'Montserrat', sans-serif;
 	color: #3C4A60;
 	font-size: 1.2rem;
