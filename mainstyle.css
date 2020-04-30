@@ -241,7 +241,7 @@ li.nav-item {
 	font-weight: 400;
 }
 
-a.navbar-brand {
+a.navbar-brand, #navbarDropdownMenuLink {
 	color: #FFF;
 	font-family: 'Montserrat', sans-serif;
 	font-weight: 800;
