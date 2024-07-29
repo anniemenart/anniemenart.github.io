@@ -99,7 +99,7 @@ async function init() {
         .append('option')
         .text(function (d) { return d; })
         .attr("value", function (d, i) { return i; })
-        .property("selected", function(d, i){ return i === 1; })
+        //.property("selected", function(d, i){ return i === 1; })
 ;    
     svg.append("rect")
         .attr("x", 427)
