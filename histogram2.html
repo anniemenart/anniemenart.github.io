@@ -79,7 +79,7 @@ async function init() {
     //.range([0, 900]);
 
     var xs = d3.scaleTime()
-        .domain([new Date(1853, 1), new Date(1890, 9)])   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
+        .domain([new Date(1852, 11), new Date(1890, 9)])   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
         .range([0, w - marginRight - marginLeft]);
 
     // filter button adapted from https://d3-graph-gallery.com/graph/line_filter.html
@@ -105,9 +105,47 @@ async function init() {
         .append("svg:rect")
         .attr("width", w - marginLeft - marginRight)
         .attr("height", h - marginTop - marginBottom)
-        .attr("x", 0)
-        .attr("y", 0);
+        .attr("dx", 200)
+        .attr("dy", 0);
 
+        const type = d3.annotationLabel
+
+        const annotations = [{
+        note: {
+            label: "For context, these letters do not start until Vincent van Gogh is 19 years old.",
+            bgPadding: 0,
+            title: "March 30, 1853: Vincent van Gogh's birth:"
+        },
+        //can use x, y directly instead of data
+        data: { date: "1855-03-30", close: 150},
+        className: "show-bg",
+        dy: 50,
+        dx: 300
+        }]
+
+        const makeAnnotations = d3.annotation()
+            .editMode(true)
+            //also can set and override in the note.padding property
+            //of the annotation object
+            .notePadding(15)
+            .type(type)
+            //accessors & accessorsInverse not needed
+            //if using x, y in annotations JSON
+            .accessors({
+                x: d => xs(new Date(d.date)),
+                y: d => d.close
+            })
+            .accessorsInverse({
+                date: d => timeFormat(x.invert(d.x)),
+                close: d => y.invert(d.y)
+            })
+            .annotations(annotations)
+
+        d3.select("svg")
+            .append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations)
+            
     // https://d3-graph-gallery.com/graph/histogram_basic.html
     var histogram = d3.histogram()
         .value(function(d, i) { return new Date(+d["Year"], +d["Month"]-1, +d["Day"]); })
@@ -147,28 +185,8 @@ async function init() {
 
     // https://www.britannica.com/biography/Vincent-van-Gogh
 
-    const type = d3.annotationCallout
 
-    const annotations = [{
-        note: {
-            label: "As you can see, these letters do not start until the time Vincent van Gogh is 19 years old.",
-            bgPadding: {"top":15,"left":10,"right":10,"bottom":10},
-            title: "March 30, 1853: Vincent van Gogh's birth"
-        },
-        //can use x, y directly instead of data
-        data: {date: "1853-02-30", close: 0},
-        //className: "show-bg",
-        ny: 100,
-        nx: 70,
-        width: 300
-        //type: d3.annotationCalloutElbow,
-        //connector: { end: "arrow" }
-        }]
-
-
-        // Add annotation to the chart
-        d3.annotation().annotations(annotations);
-
+    
         
     // zoom from https://d3-graph-gallery.com/graph/interactivity_zoom.html
     var zoom = d3.zoom()
@@ -196,31 +214,6 @@ async function init() {
         .call(zoom);
         
     create_table(letter_data);
-
-    const makeAnnotations = d3.annotation()
-        .editMode(true)
-        //also can set and override in the note.padding property
-        //of the annotation object
-        .notePadding(15)
-        .type(type)
-        //accessors & accessorsInverse not needed
-        //if using x, y in annotations JSON
-        .accessors({
-            x: d => xs(new Date(d.date))+marginLeft,
-            y: d => ys(d.close)
-        })
-        .accessorsInverse({
-            date: d => timeFormat(x.invert(d.x)),
-            close: d => y.invert(d.y)
-        })
-        .annotations(annotations)
-
-        
-    svg  
-        .append("g")
-        .attr("class", "annotation-group")
-        .call(makeAnnotations)
-
 
 
     function updateChart() {
