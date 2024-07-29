@@ -12,6 +12,7 @@
         table tr > *:nth-child(4) { width:15%; }
 
         th {  text-align: left;}
+
     </style>
 </head>
 
@@ -21,27 +22,34 @@
     <h2>By Annie Menart</h2>
     <h3><a href="https://github.com/anniemenart/vangoghletters">Data Source</a></h3>
 
+    
     <a href="https://anniemenart.github.io/histogram1.html">
-        <button>Scene 1</button>
+        <button>Start</button>
     </a>
 
     <a href="https://anniemenart.github.io/histogram2.html">
-        <button>Scene 2</button>
+        <button><b>Early life</b></button>
+    </a>
+
+    <a href="https://anniemenart.github.io/histogram2-1.html">
+        <button>Artist Career</button>
+    </a>
+
+    <a href="https://anniemenart.github.io/histogram2-2.html">
+        <button>Starry Night</button>
+    </a>
+
+    <a href="https://anniemenart.github.io/histogram2-3.html">
+        <button>Death</button>
     </a>
 
     <a href="https://anniemenart.github.io/histogram3.html">
         <button>Explore</button>
     </a>
 
-    <br>
-    <br>
+    <h3>Early Life</h3>
     <select id="dropdownButton"></select>
-    <br>
-    <br>
 
-    <p>In this scene, only the letters Vincent van Gogh sent are shown. You can change this by using the drop down menu above.</p>    
-
-    
     <svg width=1000 height=500>
     </svg>
 
@@ -71,7 +79,7 @@ async function init() {
     //.range([0, 900]);
 
     var xs = d3.scaleTime()
-        .domain([new Date(1872, 6), new Date(1890, 9)])   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
+        .domain([new Date(1853, 1), new Date(1890, 9)])   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
         .range([0, w - marginRight - marginLeft]);
 
     // filter button adapted from https://d3-graph-gallery.com/graph/line_filter.html
@@ -137,18 +145,26 @@ async function init() {
         .style("fill", "#69b3a2")
         .on('click', create_table);
 
-    const annotations = [
-        {
-            note: {
-            label: "Here is the annotation label",
-            title: "Annotation title"
-            },
-            x: new Date(1978, 0, 1),
-            y: 100,
-            dy: 100,
-            dx: xs(new Date(1978, 0, 1))
-        }
-        ]
+    // https://www.britannica.com/biography/Vincent-van-Gogh
+
+    const type = d3.annotationCallout
+
+    const annotations = [{
+        note: {
+            label: "As you can see, these letters do not start until the time Vincent van Gogh is 19 years old.",
+            bgPadding: {"top":15,"left":10,"right":10,"bottom":10},
+            title: "March 30, 1853: Vincent van Gogh's birth"
+        },
+        //can use x, y directly instead of data
+        data: {date: "1853-02-30", close: 0},
+        //className: "show-bg",
+        ny: 100,
+        nx: 70,
+        width: 300
+        //type: d3.annotationCalloutElbow,
+        //connector: { end: "arrow" }
+        }]
+
 
         // Add annotation to the chart
         d3.annotation().annotations(annotations);
@@ -180,6 +196,31 @@ async function init() {
         .call(zoom);
         
     create_table(letter_data);
+
+    const makeAnnotations = d3.annotation()
+        .editMode(true)
+        //also can set and override in the note.padding property
+        //of the annotation object
+        .notePadding(15)
+        .type(type)
+        //accessors & accessorsInverse not needed
+        //if using x, y in annotations JSON
+        .accessors({
+            x: d => xs(new Date(d.date))+marginLeft,
+            y: d => ys(d.close)
+        })
+        .accessorsInverse({
+            date: d => timeFormat(x.invert(d.x)),
+            close: d => y.invert(d.y)
+        })
+        .annotations(annotations)
+
+        
+    svg  
+        .append("g")
+        .attr("class", "annotation-group")
+        .call(makeAnnotations)
+
 
 
     function updateChart() {

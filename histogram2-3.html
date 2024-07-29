@@ -12,6 +12,7 @@
         table tr > *:nth-child(4) { width:15%; }
 
         th {  text-align: left;}
+
     </style>
 </head>
 
@@ -38,23 +39,19 @@
     </a>
 
     <a href="https://anniemenart.github.io/histogram2-3.html">
-        <button>Death</button>
+        <button><b>Death</b></button>
     </a>
 
     <a href="https://anniemenart.github.io/histogram3.html">
-        <button><b>Explore</b></button>
+        <button>Explore</button>
     </a>
 
-
-    <h3>Explore on your own!</h3>
-
-    <p>Now you can explore. On Chrome, you can Zoom into the histogram.</p>
-    <p>The selection menu below allows you to select which letters (all, letters van Gogh received, and letters van Gogh sent) are shown on the histogram and in the table.</p>    
-
+    <h3>Death</h3>
     <select id="dropdownButton"></select>
-  
-  
 
+
+
+    
     <svg width=1000 height=500>
     </svg>
 
@@ -84,7 +81,7 @@ async function init() {
     //.range([0, 900]);
 
     var xs = d3.scaleTime()
-        .domain([new Date(1872, 6), new Date(1890, 9)])   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
+        .domain([new Date(1872, 1), new Date(1890, 12)])   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
         .range([0, w - marginRight - marginLeft]);
 
     // filter button adapted from https://d3-graph-gallery.com/graph/line_filter.html
@@ -100,8 +97,49 @@ async function init() {
         .enter()
         .append('option')
         .text(function (d) { return d; })
-        .attr("value", function (d, i) { return i; });
-    
+        .attr("value", function (d, i) { return i; })
+        .property("selected", function(d, i){ return i === 1; })
+    ;    
+
+
+    const type = d3.annotationLabel
+
+    const annotations = [{
+    note: {
+        label: "Vincent van Gogh's death'.",
+        bgPadding: 20,
+        title: "July 29, 1890:"
+    },
+    //can use x, y directly instead of data
+    data: { date: "1891-08-29", close: 185.02 },
+    className: "show-bg",
+    dy: -20,
+    dx: -200
+    }]
+
+    const makeAnnotations = d3.annotation()
+        .editMode(true)
+        //also can set and override in the note.padding property
+        //of the annotation object
+        .notePadding(15)
+        .type(type)
+        //accessors & accessorsInverse not needed
+        //if using x, y in annotations JSON
+        .accessors({
+            x: d => xs(new Date(d.date)),
+            y: d => d.close
+        })
+        .accessorsInverse({
+            date: d => timeFormat(x.invert(d.x)),
+            close: d => y.invert(d.y)
+        })
+        .annotations(annotations)
+
+    d3.select("svg")
+        .append("g")
+        .attr("class", "annotation-group")
+        .call(makeAnnotations)
+
 
     // zooming from https://d3-graph-gallery.com/graph/interactivity_zoom.html
     var clip = svg.append("defs").append("svg:clipPath")
@@ -149,21 +187,8 @@ async function init() {
         .style("fill", "#69b3a2")
         .on('click', create_table);
 
-    const annotations = [
-        {
-            note: {
-            label: "Here is the annotation label",
-            title: "Annotation title"
-            },
-            x: new Date(1978, 0, 1),
-            y: 100,
-            dy: 100,
-            dx: xs(new Date(1978, 0, 1))
-        }
-        ]
+    // https://www.britannica.com/biography/Vincent-van-Gogh
 
-        // Add annotation to the chart
-        d3.annotation().annotations(annotations);
 
         
     // zoom from https://d3-graph-gallery.com/graph/interactivity_zoom.html
@@ -192,6 +217,7 @@ async function init() {
         .call(zoom);
         
     create_table(letter_data);
+
 
 
     function updateChart() {
