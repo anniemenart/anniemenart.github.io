@@ -128,7 +128,7 @@ async function init() {
     var histogram = d3.histogram()
         .value(function(d, i) { return new Date(+d["Year"], +d["Month"]-1, +d["Day"]); })
         .domain(xs.domain())
-        .thresholds(xs.ticks(70));
+        .thresholds(xs.ticks(200));
 
     var bins = histogram(letter_data);
 
