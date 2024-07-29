@@ -1,0 +1,222 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+
+<head>
+    <style>
+        body {width: 80%;
+                margin-left: 10%;}
+        table tr > *:nth-child(1) { width:20%; }
+        table tr > *:nth-child(2) { width:30%; }
+        table tr > *:nth-child(3) { width:35%; }
+        table tr > *:nth-child(4) { width:15%; }
+
+        th {  text-align: left;}
+    </style>
+</head>
+
+<body onload='init()'>
+
+    <select id="dropdownButton"></select>
+
+    <svg width=1000 height=500>
+    </svg>
+
+    <table></table>
+<script>
+async function init() {
+
+    // inspired by https://observablehq.com/@d3/zoomable-bar-chart and https://d3-graph-gallery.com/graph/histogram_basic.html
+    const w = 1000;
+    const h = 500;
+    const marginTop = 50;
+    const marginBottom = 50;
+    const marginLeft = 50;
+    const marginRight = 50;
+
+    const letter_data =  await d3.csv("https://raw.githubusercontent.com/anniemenart/vangoghletters/main/letter_data_with_dates_FINAL copy 4.csv");
+    const letters_count =  await d3.csv("https://raw.githubusercontent.com/anniemenart/vangoghletters/main/letters_count_by_month.csv");
+    const paintings_data = await d3.csv("https://raw.githubusercontent.com/anniemenart/vangoghletters/main/paintings_all_data.csv");
+
+    var svg = d3.select('svg')
+        .append("g");
+
+    //var x = d3.scaleTime()
+    //.domain(d3.extent(data, function(d) {
+    //    return Date(+d["Year"], +d["Month"]-1, +d["Day"]);
+    //}))   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
+    //.range([0, 900]);
+
+    var xs = d3.scaleTime()
+        .domain([new Date(1872, 6), new Date(1890, 9)])   // https://stackoverflow.com/questions/48267195/d3-axis-with-dates
+        .range([0, w - marginRight - marginLeft]);
+
+    // filter button adapted from https://d3-graph-gallery.com/graph/line_filter.html
+    // and https://d3-graph-gallery.com/graph/interactivity_button.html
+    var buttonOptions = ["All", "Letters from Van Gogh", "Letters sent to Van Gogh"]
+    
+    var dropdown = d3.select("#dropdownButton");
+    
+    dropdown
+        .selectAll('myOptions')
+        .data(buttonOptions)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; })
+        .attr("value", function (d, i) { return i; });
+
+    // zooming from https://d3-graph-gallery.com/graph/interactivity_zoom.html
+    var clip = svg.append("defs").append("svg:clipPath")
+        .attr("id", "clip")
+        .append("svg:rect")
+        .attr("width", w - marginLeft - marginRight)
+        .attr("height", h - marginTop - marginBottom)
+        .attr("x", 0)
+        .attr("y", 0);
+
+    // https://d3-graph-gallery.com/graph/histogram_basic.html
+    var histogram = d3.histogram()
+        .value(function(d, i) { return new Date(+d["Year"], +d["Month"]-1, +d["Day"]); })
+        .domain(xs.domain())
+        .thresholds(xs.ticks(70));
+
+    var bins = histogram(letter_data);
+
+    var ys = d3.scaleLinear()
+        .range([h - marginTop - marginBottom, 0]);
+        ys.domain([0, d3.max(bins, function(d) { return d.length; })]);
+    
+    var hist = svg
+        .append("g")
+        .attr("clip-path", "url(#clip)");
+    
+        
+    hist
+        .attr("transform", "translate("+ marginLeft +","+ marginTop +")")
+        .selectAll('rect')
+        .data(bins)
+        .enter()
+        .append('rect')
+        .attr("x", 1)
+        .attr("transform", function(d) { return "translate(" + xs(d.x0) + "," + ys(d.length) + ")"; })
+        .attr("width", function(d) { return xs(d.x1) - xs(d.x0) -1 ; })
+        .attr("height", function(d) { return  h - marginTop - marginBottom - ys(d.length); })
+        .style("fill", "#69b3a2");
+
+    // zoom from https://d3-graph-gallery.com/graph/interactivity_zoom.html
+    var zoom = d3.zoom()
+        .scaleExtent([1, 50])
+        .extent([[0, 0], [w-marginLeft-marginRight, h-marginTop-marginBottom]])
+        .on("zoom", updateChart);
+    
+    var yAxis = svg
+        .append("g")
+        .attr("transform", "translate("+ marginLeft +","+ marginTop +")")
+        .call(d3.axisLeft(ys));
+
+    var xAxis = svg
+        .append("g")
+        .attr("transform", "translate("+  marginLeft +","+(h-marginTop)+")")
+        .call(d3.axisBottom(xs));
+        //.tickFormat(d3.timeFormat("%m/%d/%Y")).tickValues(data.map(function(d) { return Date(+d["Year"], +d["Month"]-1, +d["Day"])}) ));
+
+    svg.append("rect")
+        .attr("width", w-marginLeft-marginRight)
+        .attr("height", h-marginTop-marginBottom)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .attr('transform', 'translate('+marginLeft+','+marginTop+')')
+        .call(zoom);
+        
+    create_table(letter_data);
+
+
+    function updateChart() {
+        var newX = d3.event.transform.rescaleX(xs);
+
+        xAxis.call(d3.axisBottom(newX))
+        
+        hist
+            .selectAll("rect")
+            .attr("x", 1)
+            .attr("transform", function(d) { return "translate(" + newX(d.x0) + "," + ys(d.length) + ")"; })
+            .attr("width", function(d) { return newX(d.x1) - newX(d.x0) -1 ; });
+            //.attr("height", function(d) { return  h - marginTop - marginBottom - ys(d.length); });
+        
+    }
+
+    // adapted from https://gist.github.com/jfreels/6733593
+    function create_table(table_data) {
+
+        d3.select('table').remove();
+
+        var table = d3.select('body').append('table');
+
+        var columns = ["Author", "Addressee", "Date", "Place"]
+
+        var thead = table.append('thead')
+
+        var tbody = table.append('tbody');
+
+
+        thead.append('tr')
+            .selectAll('th')
+            .data(columns).enter()
+            .append('th')
+            .text(function (column) {return column; });
+
+        var rows = tbody.selectAll('tr')
+            .data(table_data)
+            .enter()
+            .append('tr');
+
+        var cells = rows.selectAll('td')
+            .data(function (row) {
+                return columns.map(function (column) {
+                    return {column: column, value: row[column]};
+                });
+            })
+            .enter()
+            .append('td')
+            .text(function (d) { return d.value; });
+
+        return table;
+
+    }
+
+    function update_dropdown(selection) {
+
+        if (selection == 0) {
+            dataFilter = letter_data;
+        } else if (selection == 1) {
+            var dataFilter = letter_data.filter(function(d){return d["Author"]=="Vincent van Gogh" })
+        } else if (selection == 2) {
+            var dataFilter = letter_data.filter(function(d){return d["Addressee"]=="Vincent van Gogh" })
+        }
+
+        create_table(dataFilter)
+
+
+        bins = histogram(dataFilter)
+
+        hist
+            .attr("transform", "translate("+ marginLeft +","+ marginTop +")")
+            .selectAll('rect')
+            .data(bins)
+            .transition()
+            .duration(1000)
+            .attr("x", 1)
+            .attr("transform", function(d) { return "translate(" + xs(d.x0) + "," + ys(d.length) + ")"; })
+            .attr("width", function(d) { return xs(d.x1) - xs(d.x0) -1 ; })
+            .attr("height", function(d) { return  h - marginTop - marginBottom - ys(d.length); })
+    }
+
+    dropdown.on("change", function(d) {
+        var selected = d3.select(this).property("value")
+        
+        update_dropdown(selected)
+    })
+
+}
+</script>
+</body>
+</html>
